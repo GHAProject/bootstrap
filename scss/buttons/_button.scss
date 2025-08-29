@@ -1,13 +1,14 @@
 @use "sass:color";
-@use "colors" as *;
-@use "config" as *;
-@use "variables" as *;
-@use "functions" as *;
-@use "vendor/rfs" as *;
-@use "mixins/border-radius" as *;
-@use "mixins/box-shadow" as *;
-@use "mixins/transition" as *;
-@use "mixins/gradients" as *;
+@use "../colors" as *;
+@use "../config" as *;
+@use "../variables" as *;
+@use "../functions" as *;
+@use "../vendor/rfs" as *;
+@use "../mixins/border-radius" as *;
+@use "../mixins/box-shadow" as *;
+@use "../mixins/transition" as *;
+@use "../mixins/gradients" as *;
+@use "button-variables" as *;
 
 // Button variants
 //
