@@ -145,6 +145,7 @@
       @include gradient-bg(var(--#{$prefix}btn-hover-bg));
       border-color: var(--#{$prefix}btn-hover-border-color);
       @include focus-ring(true);
+      --#{$prefix}focus-ring-offset: 1px;
     }
 
     .btn-check:focus-visible + & {
