@@ -19,11 +19,34 @@ Form controls are styled with a mix of Sass and CSS variables, allowing them to 
 
 ## Sizing
 
-Set heights using classes like `.form-control-lg` and `.form-control-sm`.
+Change the size of a form control by using classes like `.form-control-lg` and `.form-control-sm`. This adjusts `height`, `padding`, `font-size`, `line-height`, and `border-radius`.
 
-<Example code={`<input class="form-control form-control-lg" type="text" placeholder=".form-control-lg" aria-label=".form-control-lg example">
-<input class="form-control" type="text" placeholder="Default input" aria-label="default input example">
-<input class="form-control form-control-sm" type="text" placeholder=".form-control-sm" aria-label=".form-control-sm example">`} />
+<Example code={`<div class="mb-3">
+    <label for="largeInput" class="form-label">Large input</label>
+    <input class="form-control form-control-lg" type="text" id="largeInput" placeholder="Large input" aria-label="Large input example">
+  </div>
+  <div class="mb-3">
+    <label for="largeTextarea" class="form-label">Large textarea</label>
+    <textarea class="form-control form-control-lg" id="largeTextarea" rows="3" placeholder="Large textarea" aria-label="Large textarea example"></textarea>
+  </div>`} />
+
+<Example code={`<div class="mb-3">
+    <label for="defaultInput" class="form-label">Default input</label>
+    <input class="form-control" type="text" id="defaultInput" placeholder="Default input" aria-label="Default input example">
+  </div>
+  <div class="mb-3">
+    <label for="defaultTextarea" class="form-label">Default textarea</label>
+    <textarea class="form-control" id="defaultTextarea" rows="3" placeholder="Default textarea" aria-label="Default textarea example"></textarea>
+  </div>`} />
+
+<Example code={`<div class="mb-3">
+    <label for="smallInput" class="form-label">Small input</label>
+    <input class="form-control form-control-sm" type="text" id="smallInput" placeholder="Small input" aria-label="Small input example">
+  </div>
+  <div class="mb-3">
+    <label for="smallTextarea" class="form-label">Small textarea</label>
+    <textarea class="form-control form-control-sm" id="smallTextarea" rows="3" placeholder="Small textarea" aria-label="Small textarea example"></textarea>
+  </div>`} />
 
 ## Form text
 
