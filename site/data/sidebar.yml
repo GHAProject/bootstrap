@@ -60,7 +60,6 @@
   pages:
     - title: Overview
     - title: Form control
-    - title: Select
     - title: Checks & radios
     - title: Range
     - title: Input group
