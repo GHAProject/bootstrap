@@ -1,11 +1,11 @@
 name: "CodeQL"
 
 on:
-  push:
-    branches:
+ # push:
+    #branches:
   #    - main
-      - v4-dev
-      - "!dependabot/**"
+     # - v4-dev
+      #- "!dependabot/**"
   pull_request:
     branches:
       - main
