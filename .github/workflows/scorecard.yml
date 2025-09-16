@@ -37,7 +37,7 @@ jobs:
         with:
             config: ${{ vars.PERMISSIONS_CONFIG }}
       - name: "Checkout code"
-        uses: actions/checkout # v5.0.0
+        uses: actions/checkout@v4 # v5.0.0
         with:
           persist-credentials: false
 
