@@ -3,7 +3,7 @@ name: CSS (node-sass)
 on:
   push:
     branches:
-      - main
+    #  - main
   pull_request:
   workflow_dispatch:
 

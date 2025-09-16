@@ -3,7 +3,7 @@ name: JS Tests
 on:
   push:
     branches:
-      - main
+     # - main
   pull_request:
   workflow_dispatch:
 
