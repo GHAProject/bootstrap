@@ -34,8 +34,8 @@ jobs:
 
     steps:
       - uses: GitHubSecurityLab/actions-permissions/monitor@v1
-          with:
-              config: ${{ vars.PERMISSIONS_CONFIG }}
+        with:
+            config: ${{ vars.PERMISSIONS_CONFIG }}
       - name: "Checkout code"
         uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
         with:
