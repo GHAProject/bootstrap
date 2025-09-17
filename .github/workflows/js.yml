@@ -21,7 +21,7 @@ jobs:
       checks: write
       contents: read
     name: JS Tests
-    runs-on: sefl-hosted
+    runs-on: self-hosted
 
     steps:
       - uses: GitHubSecurityLab/actions-permissions/monitor@v1
