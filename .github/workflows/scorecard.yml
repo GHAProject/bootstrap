@@ -11,8 +11,8 @@ on:
   # https://github.com/ossf/scorecard/blob/main/docs/checks.md#maintained
   schedule:
     - cron: '27 12 * * 2'
-  push:
-    branches: [ "main" ]
+  #push:
+   # branches: [ "main" ]
 
 # Declare default permissions as read only.
 permissions: read-all
@@ -20,7 +20,7 @@ permissions: read-all
 jobs:
   analysis:
     name: Scorecard analysis
-    runs-on: ubuntu-latest
+    runs-on: self-hosted
     # `publish_results: true` only works when run from the default branch. conditional can be removed if disabled.
     if: github.event.repository.default_branch == github.ref_name || github.event_name == 'pull_request'
     permissions:
@@ -37,7 +37,7 @@ jobs:
         with:
             config: ${{ vars.PERMISSIONS_CONFIG }}
       - name: "Checkout code"
-        uses: actions/checkout@08c6903cd8c0fde910a37f88322edcfb5dd907a8 # v5.0.0
+        uses: actions/checkout@v4 # v5.0.0
         with:
           persist-credentials: false
 
@@ -59,7 +59,7 @@ jobs:
           # For private repositories:
           #   - `publish_results` will always be set to `false`, regardless
           #     of the value entered here.
-          publish_results: true
+          publish_results: false
 
           # (Optional) Uncomment file_mode if you have a .gitattributes with files marked export-ignore
           # file_mode: git

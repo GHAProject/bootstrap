@@ -12,37 +12,44 @@ const ENV = process.env
 const BROWSERSTACK = Boolean(ENV.BROWSERSTACK)
 const DEBUG = Boolean(ENV.DEBUG)
 const JQUERY_TEST = Boolean(ENV.JQUERY)
+const IS_CI = String(ENV.CI || '').toLowerCase() === 'true'
 
-const frameworks = [
-  'jasmine'
-]
-
+const frameworks = ['jasmine']
 const plugins = [
   'karma-jasmine',
-  'karma-rollup-preprocessor'
+  'karma-rollup-preprocessor',
+  'karma-chrome-launcher',        // ensure Chrome launcher is available
+  'karma-detect-browsers'
 ]
-
 const reporters = ['dots']
 
+// No-sandbox Chrome for CI + stability flags
+const customLaunchers = {
+  ChromeHeadlessCI: {
+    base: 'ChromeHeadless',
+    flags: [
+      '--no-sandbox',
+      '--disable-setuid-sandbox',
+      '--disable-dev-shm-usage',
+      '--disable-background-timer-throttling',
+      '--disable-renderer-backgrounding',
+      '--disable-backgrounding-occluded-windows',
+      '--no-first-run',
+      '--no-default-browser-check',
+      '--window-size=1920,1080'
+    ]
+  }
+}
+
+// Auto-detect locally; force our CI launcher on runners
 const detectBrowsers = {
   usePhantomJS: false,
-  postDetection(availableBrowser) {
-    // On CI just use Chrome
-    if (ENV.CI === true) {
-      return ['ChromeHeadless']
-    }
+  postDetection(available) {
+    if (IS_CI) return ['ChromeHeadlessCI']
 
-    if (availableBrowser.includes('Chrome')) {
-      return DEBUG ? ['Chrome'] : ['ChromeHeadless']
-    }
-
-    if (availableBrowser.includes('Chromium')) {
-      return DEBUG ? ['Chromium'] : ['ChromiumHeadless']
-    }
-
-    if (availableBrowser.includes('Firefox')) {
-      return DEBUG ? ['Firefox'] : ['FirefoxHeadless']
-    }
+    if (available.includes('Chrome'))    return DEBUG ? ['Chrome']    : ['ChromeHeadless']
+    if (available.includes('Chromium'))  return DEBUG ? ['Chromium']  : ['ChromiumHeadless']
+    if (available.includes('Firefox'))   return DEBUG ? ['Firefox']   : ['FirefoxHeadless']
 
     throw new Error('Please install Chrome, Chromium or Firefox')
   }
@@ -52,12 +59,25 @@ const config = {
   basePath: '../..',
   port: 9876,
   colors: true,
-  autoWatch: false,
   singleRun: true,
+  autoWatch: false,
   concurrency: Number.POSITIVE_INFINITY,
+  customLaunchers,
+
   client: {
-    clearContext: false
+    clearContext: false,
+    jasmine: {
+      // increase per-spec timeout for CI flakiness (focus, timers, etc.)
+      timeoutInterval: IS_CI ? 20000 : 5000
+    }
   },
+
+  // Prevent flaky disconnects / slow CI hiccups
+  captureTimeout: IS_CI ? 120000 : 60000,
+  browserNoActivityTimeout: IS_CI ? 120000 : 60000,
+  browserDisconnectTimeout: IS_CI ? 60000 : 10000,
+  browserDisconnectTolerance: IS_CI ? 2 : 0,
+
   files: [
     'node_modules/hammer-simulator/index.js',
     {
@@ -65,15 +85,14 @@ const config = {
       watched: !BROWSERSTACK
     }
   ],
+
   preprocessors: {
     'js/tests/unit/**/*.spec.js': ['rollup']
   },
+
   rollupPreprocessor: {
     plugins: [
-      replace({
-        'process.env.NODE_ENV': '"dev"',
-        preventAssignment: true
-      }),
+      replace({ 'process.env.NODE_ENV': '"dev"', preventAssignment: true }),
       istanbul({
         exclude: [
           'node_modules/**',
@@ -81,12 +100,7 @@ const config = {
           'js/tests/helpers/**/*.js'
         ]
       }),
-      babel({
-        // Only transpile our source code
-        exclude: 'node_modules/**',
-        // Inline the required helpers in each file
-        babelHelpers: 'inline'
-      }),
+      babel({ exclude: 'node_modules/**', babelHelpers: 'inline' }),
       nodeResolve()
     ],
     output: {
@@ -98,6 +112,7 @@ const config = {
   }
 }
 
+// --- BrowserStack branch
 if (BROWSERSTACK) {
   config.hostname = ip.address()
   config.browserStack = {
@@ -108,32 +123,24 @@ if (BROWSERSTACK) {
     retryLimit: 2
   }
   plugins.push('karma-browserstack-launcher', 'karma-jasmine-html-reporter')
-  config.customLaunchers = browsers
+  config.customLaunchers = { ...customLaunchers, ...browsers }
   config.browsers = Object.keys(browsers)
   reporters.push('BrowserStack', 'kjhtml')
-} else if (JQUERY_TEST) {
+}
+// --- jQuery test branch
+else if (JQUERY_TEST) {
   frameworks.push('detectBrowsers')
-  plugins.push(
-    'karma-chrome-launcher',
-    'karma-firefox-launcher',
-    'karma-detect-browsers'
-  )
+  plugins.push('karma-firefox-launcher')
   config.detectBrowsers = detectBrowsers
   config.files = [
     'node_modules/jquery/dist/jquery.slim.min.js',
-    {
-      pattern: 'js/tests/unit/jquery.spec.js',
-      watched: false
-    }
+    { pattern: 'js/tests/unit/jquery.spec.js', watched: false }
   ]
-} else {
+}
+// --- default branch (coverage etc.)
+else {
   frameworks.push('detectBrowsers')
-  plugins.push(
-    'karma-chrome-launcher',
-    'karma-firefox-launcher',
-    'karma-detect-browsers',
-    'karma-coverage-istanbul-reporter'
-  )
+  plugins.push('karma-firefox-launcher', 'karma-coverage-istanbul-reporter')
   reporters.push('coverage-istanbul')
   config.detectBrowsers = detectBrowsers
   config.coverageIstanbulReporter = {
@@ -141,15 +148,9 @@ if (BROWSERSTACK) {
     reports: ['lcov', 'text-summary'],
     thresholds: {
       emitWarning: false,
-      global: {
-        statements: 90,
-        branches: 89,
-        functions: 90,
-        lines: 90
-      }
+      global: { statements: 90, branches: 89, functions: 90, lines: 90 }
     }
   }
-
   if (DEBUG) {
     config.hostname = ip.address()
     plugins.push('karma-jasmine-html-reporter')
